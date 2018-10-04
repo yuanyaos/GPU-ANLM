@@ -19,6 +19,7 @@
 #include "filterGPU.h"
 #include <time.h>
 #include <cuda.h>
+#include <stdbool.h>
 
 #define CUDA_ASSERT(a) cuda_assess((a),__FILE__,__LINE__)
 
@@ -172,14 +173,14 @@ __global__ static void ANLMfilter(float *Estimate)
 	k_sl = threadIdx_z+gcfg->apronShared;
 	// return if the thread number exceeds the dimension
 
-	Estimate[k*rc+(j*gcfg->dimx)+i] = 1000000;
+	Estimate[k*rc+(j*gcfg->dimx)+i] = (float) blockIdx.z;
 	return;
-	cn = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);		// the voxel to be filtered
-    if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0) //  || cn<0
-    {
-    	// Estimate[k*rc+(j*gcfg->dimx)+i] = 0;
-         return;
-    }
+	// cn = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);		// the voxel to be filtered
+ //    if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0) //  || cn<0
+ //    {
+ //    	// Estimate[k*rc+(j*gcfg->dimx)+i] = 0;
+ //         return;
+ //    }
  //     else{
  //     	Estimate[k*rc+(j*gcfg->dimx)+i] = 1000;
  //     	if(i>83 && i<90 && j==5 && k==133)
@@ -369,7 +370,7 @@ __global__ static void ANLMfilter(float *Estimate)
 	    totalweight = (totalweight>0.0f)?totalweight:1.0f;
 	    estimate = estimate/totalweight;
 	    estimate = estimate-2.0f*distanciaminima;
-	    estimate = (estimate>0.0f)?estimate:tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
+	    estimate = (estimate>0.0f)?estimate:0;
 	    estimate = sqrtf(estimate);
 	}
 
@@ -528,7 +529,7 @@ void cuda_assess(cudaError_t cuerr,const char *file, const int linenum){
      }
 }
 
-void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, bool rician)
+void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, int rician)
 
 {
 /*

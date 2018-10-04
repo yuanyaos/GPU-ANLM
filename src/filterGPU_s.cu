@@ -18,6 +18,7 @@
 #include "filterGPU.h"
 #include <time.h>
 #include <cuda.h>
+#include <stdbool.h>
 
 #define CUDA_ASSERT(a) cuda_assess((a),__FILE__,__LINE__)
 
@@ -515,7 +516,13 @@ __global__ static void preProcess(cudaPitchedPtr mean, cudaPitchedPtr R, cudaPit
 	__syncthreads();
 }
 
-void runFilter_s(float * ima_input, float * Estimate1, int f1, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, bool rician)
+void cuda_assess(cudaError_t cuerr,const char *file, const int linenum){
+     if(cuerr!=cudaSuccess){
+         printf("CUDA ERROR(%d): %s at file %s line %d\n",-(int)cuerr,(char *)cudaGetErrorString(cuerr),file,linenum);
+     }
+}
+
+void runFilter_s(float * ima_input, float * Estimate1, int f1, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, int rician)
 
 {
 /*

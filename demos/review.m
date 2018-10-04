@@ -125,7 +125,8 @@ fluence_brain(vol==0) = -1;
 % t = -1*ones(2*offset+s,'single');
 % t(offset:offset+s(1)-1,offset:offset+s(2)-1,offset:offset+s(3)-1) = fluence_brain;
 % fluence_brain = t;
-% fluence_brain = fluence_brain(1:100,1:100,1:100);
+% fluence_brain = fluence_brain(:,:,1:150);
+fluence_brain = cat(3,fluence_brain,10000*ones(166,209,10));
 
 tic;
 % The output has the same order of f1 and f2
@@ -141,7 +142,7 @@ t_mix=toc;
 % fluence_brain = fluence_brain(offset:offset+s(1)-1,offset:offset+s(2)-1,offset:offset+s(3)-1);
 % filtered_fluence_brain = filtered_fluence_brain(offset:offset+s(1)-1,offset:offset+s(2)-1,offset:offset+s(3)-1);
 
-% Plot brain
+%% Plot brain
 
 cut = 80;
 imaS1(imaS1<0) = 0;
