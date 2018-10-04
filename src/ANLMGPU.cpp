@@ -124,7 +124,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     request = blockwidth2+2*(v+f1);
-    printf("########################## GPU-accelerated Adaptive Non-local Means Filter ##########################");
+    printf("########################## 6 GPU-accelerated Adaptive Non-local Means Filter ##########################");
     printf("\nsearch size=%d\n1st filtering patch size=%d\n2nd filtering patch size=%d\nrician=%d\nGPU id=%d\n3D block size=%d\n",2*v+1,2*f2+1,2*f1+1,r,gpuid,blockwidth2);
 
 	if(request<=18){
@@ -201,6 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	filterParam.flag=flag;
 	
 	passParam(&filterParam);
+
 
     return;
 

@@ -67,6 +67,8 @@ N = 2*N1;
 L = length(sf);
 y = zeros(N+L-2, N2, N3);
 
+% lo(lo<0) = 0;
+% hi(hi<0) = 0;
 for k = 1:N3
    y(:, :, k) = upfirdn(lo(:, :, k), lpf, 2, 1) + upfirdn(hi(:, :, k), hpf, 2, 1);
 end
