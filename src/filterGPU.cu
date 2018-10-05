@@ -181,13 +181,9 @@ __global__ static void ANLMfilter(float *Estimate)
  //    	// Estimate[k*rc+(j*gcfg->dimx)+i] = 0;
  //         return;
  //    }
- //     else{
- //     	Estimate[k*rc+(j*gcfg->dimx)+i] = 1000;
- //     	if(i>83 && i<90 && j==5 && k==133)
- //     		printf("x=%d \t y=%d \t z=%d \t value=%f \n", i, j, k, cn);
 
- //     	return;
- //     }
+    if(i>90 && i<100 && j==100 && k==150)
+    	printf("x=%d \t y=%d \t z=%d \t value=%f \n", i, j, k, 100);
 
 	if(threadIdx_z==0){
 	    kstart = -gcfg->apronShared;
@@ -374,7 +370,7 @@ __global__ static void ANLMfilter(float *Estimate)
 	    estimate = sqrtf(estimate);
 	}
 
-	Estimate[k*rc+(j*gcfg->dimx)+i] = estimate;// tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
+	Estimate[k*rc+(j*gcfg->dimx)+i] = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
 	__syncthreads();
 
 }
@@ -768,7 +764,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	param.rpatchnomalize = param.rpatchnomalize*param.rpatchnomalize*param.rpatchnomalize;
 	param.blockdimx = (dimx+width-1)/width;
 	param.blockdimy = (dimy+width-1)/width;
-	param.blockdimz = (dimy+width-1)/width;
+	param.blockdimz = (dimz+width-1)/width;
 	param.blockwidth = width;
 	param.sharedwidth_x = 2*(width+2*(f1+v));	// v+f1 is the apron. The shared width x is twice larger because we want to store the mean matrix in shared memory.
 	param.sharedwidth = width+2*(f1+v);		// The shared width at other dimension is still not changed.
@@ -822,7 +818,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	param.rpatchnomalize = param.rpatchnomalize*param.rpatchnomalize*param.rpatchnomalize;
 	param.blockdimx = (dimx+width-1)/width;
 	param.blockdimy = (dimy+width-1)/width;
-	param.blockdimz = (dimy+width-1)/width;
+	param.blockdimz = (dimz+width-1)/width;
 	param.sharedwidth_x = 2*(width+2*(f2+v));	// v+f1 is the apron. The shared width x is twice larger because we want to store the mean matrix in shared memory.
 	param.sharedwidth = width+2*(f2+v);		// The shared width at other dimension is still not changed.
 	param.sharedSlice = param.sharedwidth_x*param.sharedwidth;

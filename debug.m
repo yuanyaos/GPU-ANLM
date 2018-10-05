@@ -2,15 +2,20 @@ clear
 
 %%
 addpath(genpath('.'))
-addpath('/drives/neza2/users/yaoshen/NEU/Research//Redbird/tensorlab/')
+addpath('/drives/neza2/users/yaoshen/NEU/Research/Redbird/tensorlab/')
 
 %% write to dat
 load brain_1e8.mat
 
 fid = fopen('input.dat', 'w');
-fwrite(fid, fluence_brain);
+fwrite(fid, fluence_brain, 'single');
 fclose(fid);
 
+
+fid = fopen('input.dat', 'r');
+At = fread(fid,'single');
+fclose(fid);
+At = reshape(At,166,209,223);
 %% read from dat
 fid=fopen('outputimg.dat','r');
 A = fread(fid,'single');

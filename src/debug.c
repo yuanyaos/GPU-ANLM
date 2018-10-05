@@ -30,8 +30,8 @@ int main(int argc, char **argv){
     fclose(fpread);
 
     for(int i=0;i<dims[0]*dims[1]*dims[2];i++){
-     //    if(i>3724200 && i<4000000)
-    	// printf("input=%f\n",inputimg[i]);
+        if(i>3490300 && i<3490400)
+    	   printf("input=%f\n",inputimg[i]);
         count++;
 	}
     printf("count=%d\n",count);
@@ -93,6 +93,9 @@ void filterdriver(int v,int f1, int f2, int s, int r, int dims[3], float *ima, f
                 ima_full[k*dimfull[0]*dimfull[1]+j*dimfull[0]+i] = ima[kt*(dims[0]*dims[1])+(jt*dims[0])+it];
 
                 if(ima[kt*(dims[0]*dims[1])+(jt*dims[0])+it]>max) max=ima[kt*(dims[0]*dims[1])+(jt*dims[0])+it];
+
+                    if(i>90 && i<100 && j==100 && k==100)
+                        printf("x=%d \t y=%d \t z=%d\t value=%f\n", i, j, k, ima_full[k*dimfull[0]*dimfull[1]+j*dimfull[0]+i]);
             }
         }
     }
