@@ -1,10 +1,10 @@
-function [fima]=mixingsubband(fimau,fimao)
-% Pierrick Coupe - pierrick.coupe@gmail.com                                  
-% Jose V. Manjon - jmanjon@fis.upv.es                                        
-% Brain Imaging Center, Montreal Neurological Institute.                     
-% Mc Gill University                                                         
-%                                                                            
-% Copyright (C) 2010 Pierrick Coupe and Jose V. Manjon                       
+function [fima]=mixingsubband(fimau,fimao)                                                    
+% Developed by Jose V. Manjon and Pierrick Coupe
+% Modified by Yaoshen Yuan
+
+% Adding mask
+fimau(fimau<=0) = nan;
+fimao(fimao<=0) = nan;
 
 s = size(fimau);
 
@@ -29,10 +29,6 @@ w1{1}{7} = w2{1}{7};
 fima = idwt3D(w1,1,sf);
 fima = fima(1:s(1),1:s(2),1:s(3));
 
-% Remove complex number
-ind = find(imag(fima)~=0);
-fima(ind)=fimau(ind);
-
 % negative checking (only for rician noise mixing)
 ind=find(fima<0);
 fima(ind)=fimau(ind);
@@ -40,6 +36,7 @@ fima(ind)=fimau(ind);
 % NAN checking
 ind=find(isnan(fima(:)));
 fima(ind)=fimau(ind);
+fima(isnan(fima)) = 0;
 
 
 
