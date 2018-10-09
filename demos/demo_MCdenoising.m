@@ -25,7 +25,7 @@ blockwidth           =           8;     % the 3D block width in GPU
 % 1e6 photons/1e7 photons
 tic;
 % The output has the same order of f1 and f2
-[imaS4,imaL4]=ANLMGPU(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
+[imaS4,imaL4]=ganlm(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
 t = toc;
 % Sub-band mixing process
 tic

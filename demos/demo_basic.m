@@ -45,7 +45,7 @@ blockwidth           =           8;     % the 3D block width in GPU
 % 1e7 photons
 tic;
 % The output has the same order of f1 and f2
-[imaS1,imaL1]=ANLMGPU(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
+[imaS1,imaL1]=ganlm(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
 t = toc;
 % Sub-band mixing process
 tic
@@ -74,7 +74,7 @@ blockwidth           =           8;     % the 3D block width in GPU
 % 1e7 photons
 tic;
 % The output has the same order of f1 and f2
-[imaS2,imaL2]=ANLMGPU(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
+[imaS2,imaL2]=ganlm(ima_1e7_refractive,v,f1,f2,rician,gpuid,blockwidth);
 t = toc;
 
 % Sub-band mixing process
@@ -104,7 +104,7 @@ blockwidth           =           8;     % the 3D block width in GPU
 % 1e7 photons
 tic;
 % The output has the same order of f1 and f2
-[imaS3,imaL3]=ANLMGPU(ima_1e7_refractive,v,f1,0,rician,gpuid,blockwidth);
+[imaS3,imaL3]=ganlm(ima_1e7_refractive,v,f1,0,rician,gpuid,blockwidth);
 t = toc
 
 figure,

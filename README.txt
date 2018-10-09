@@ -21,15 +21,14 @@ Simulations," (under review), 2018
 == Contents ==
 
  \src
-        --mixingsubband.m
-        --ANLMGPU.c
-        --filterGPU.h
-        --filterGPU.cu
-        --filterGPU_v.cu
-        --filterGPU_s.cu
+    --ANLMGPU.c
+    --filterGPU.h
+    --filterGPU.cu
+    --filterGPU_v.cu
+    --filterGPU_s.cu
     --Makefile
  \bin
-        --ANLMGPU.mexa64
+    --ganlm.mexa64
  \demo
     --demo_basic.m
     --demo_MCdenoising.m
