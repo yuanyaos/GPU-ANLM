@@ -102,8 +102,10 @@ load brain_1e8.mat
 y_cut=89.5;
 
 figure;
-imagesc((rot90(squeeze(log10(fluence_brain(:,y_cut+0.5,:))))),[-16 8]);
-colorbar
+imagesc((rot90(squeeze(log10(filtered_fluence_brain(:,y_cut+0.5,:))))),[-16 8]);
+c = colorbar;
+c.FontSize = 20;
+c.Location='northoutside';
 colormap jet
 axis equal;
 axis tight
@@ -128,6 +130,7 @@ for i=1:size(nanidx,2)
 end
 
 axis equal;
+axis([1 165 1 92])
 colormap;
 % set(gca,'ylim', [160 225]);
 set(gca,'fontsize',20);
