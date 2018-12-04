@@ -1,3 +1,21 @@
+/*--------------------------------------------------------------------------*/
+// A GPU-accelerated Adaptive Non-Local Means Filter for Denoising 3D Monte
+// Carlo Photon Transport Simulations
+/*--------------------------------------------------------------------------*/
+
+// Yaoshen Yuan - yuan.yaos at husky.neu.edu
+// Qianqian Fang - q.fang at neu.edu
+// Computational Optics & Translational Imaging Lab
+// Northeastern University
+
+// Publication:
+// Yaoshen Yuan, Leiming Yu, Zafer Dogan, and Qianqian Fang, "Graphics processing
+// units-accelerated adaptive nonlocal means filter for denoising three-dimensional
+// Monte Carlo photon transport simulations," J. of Biomedical Optics, 23(12), 121618 (2018).
+// https://doi.org/10.1117/1.JBO.23.12.121618
+
+// Copyright (C) 2018 Yaoshen Yuan, Qianqian Fang
+
 #ifndef __CUDA_YAOSHEN
 #define __CUDA_YAOSHEN
 

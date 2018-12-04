@@ -10,6 +10,12 @@
 // Computational Optics & Translational Imaging Lab
 // Northeastern University
 
+// Publication:
+// Yaoshen Yuan, Leiming Yu, Zafer Dogan, and Qianqian Fang, "Graphics processing
+// units-accelerated adaptive nonlocal means filter for denoising three-dimensional
+// Monte Carlo photon transport simulations," J. of Biomedical Optics, 23(12), 121618 (2018).
+// https://doi.org/10.1117/1.JBO.23.12.121618
+
 // Copyright (C) 2018 Yaoshen Yuan, Qianqian Fang
 
 
@@ -30,7 +36,7 @@ typedef struct
     float * var_image;
     float * estimate1;
     float * estimate2;
-    int rV;			// search size
+    int rV;		// search size
     int rPl;		// larger patch radius
     int rPs;		// smaller patch size
     float max_image;
@@ -38,7 +44,7 @@ typedef struct
     int blockwidth2;
     int s;
     int gpuid;
-    bool R; 			// Rician noise
+    bool R; 		// Rician noise
     int flag;
 }myargument;
 
