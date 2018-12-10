@@ -552,7 +552,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	
 	//@@@@@@@@@@@@ Pre-processing kernel starts @@@@@@@@@@@@/
 	int dimPrecom_x, dimPrecom_y, dimPrecom_z, dimfull_x, dimfull_y, dimfull_z, widthPrecom, blockPrecom_x, blockPrecom_y, blockPrecom_z, sharedsizePre;
-	cudaArray *ima=0, *meansArray=0, *variancesArray=0, *RArray=0;
+	cudaArray *ima=0; //, *meansArray=0, *variancesArray=0, *RArray=0;
 	cudaEvent_t start, stop;
 	float elapsedTime;
 	
@@ -630,7 +630,6 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	
 	
 	
-/*
 	//@@@@@@@@@@ Copy from device to host start @@@@@@@@@@/
 	cudaExtent imaOut = make_cudaExtent(dimfull_x,dimfull_y,dimfull_z);
 	cudaMemcpy3DParms copyParamsOutput1 = {0};
@@ -649,11 +648,10 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParamsOutput2.kind = cudaMemcpyDeviceToHost;	// copy from host to device
 	CUDA_ASSERT(cudaMemcpy3D(&copyParamsOutput2));
 	//@@@@@@@@@@ Copy from device to host end @@@@@@@@@@/
-*/	
 
 
 
-
+/*
 
 
 	//@@@@@@@@@@@@ 1st kernel finished. Binding to texture memory starts @@@@@@@@@@@@/
@@ -867,7 +865,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	CUDA_ASSERT(cudaFreeArray(meansArray));
 	CUDA_ASSERT(cudaFreeArray(variancesArray));
 	CUDA_ASSERT(cudaFreeArray(RArray));
-
+*/
 
 	CUDA_ASSERT(cudaFreeArray(ima));
 	CUDA_ASSERT(cudaFree(mean.ptr));

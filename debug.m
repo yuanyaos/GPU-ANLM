@@ -21,13 +21,13 @@ fid=fopen('outputimg.dat','r');
 A = fread(fid,'single');
 fclose(fid);
 
-output = reshape(A,166,209,223);
+output = reshape(A,166+10,209+10,223+10);
 % figure,imagesc(squeeze(log10(output(:,80,:))),[-16 8]),colormap jet
-figure,slice3(output)
+figure,slice3(log10(output))
 
 fid=fopen('outputimg2.dat','r');
 A = fread(fid,'single');
 fclose(fid);
 
-output2 = reshape(A,166,209,223);
-figure,slice3(output2)
+output2 = reshape(A,166+10,209+10,223+10);
+figure,slice3(log10(output2))
