@@ -182,6 +182,10 @@ __global__ static void ANLMfilter(float *Estimate)
 	if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0)
 	 return;
 
+	// if(i>90 && i<95 && j>90 && j<95 && k==100){
+	// 	printf("x=%d\t y=%d\t z=%d\t value=%f\n", i, j, k, cn);
+	// }
+
 	if(threadIdx_z==0){
 	    kstart = -gcfg->apronShared;
 	    kcount = gcfg->apronShared+1;
@@ -404,6 +408,10 @@ __global__ static void preProcess(cudaPitchedPtr mean, cudaPitchedPtr R, cudaPit
         if(i>=dimfull_x || j>=dimfull_y || k>=dimfull_z)
              return;
 
+ //        if(i>50 && i<55 && j>50 && j<55 && k==50){
+	// 	printf("x=%d\t y=%d\t z=%d\t imagePre=%f\n", i, j, k, tex3D(ima_tex,i_fl,j_fl,k_fl));
+	// }
+
 	/* general case */		
 	if(threadIdx_z==blockwidth-1 || k==dimfull_z-1){
 	    kstart = 0;
@@ -518,6 +526,10 @@ __global__ static void preProcess(cudaPitchedPtr mean, cudaPitchedPtr R, cudaPit
 
 	row3[i] = Vt;	// Save variance value into global var matrix
 	
+	// if(i>50 && i<55 && j>50 && j<55 && k==50){
+	// 	printf("x=%d\t y=%d\t z=%d\t Mt=%f\n", i, j, k, Mt);
+	// }
+
 	__syncthreads();
 }
 
@@ -549,10 +561,11 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop,gpuid);
 	printf("Device name: %s\n",prop.name);
+	CUDA_ASSERT(cudaSetDevice(gpuid));
 	
 	//@@@@@@@@@@@@ Pre-processing kernel starts @@@@@@@@@@@@/
 	int dimPrecom_x, dimPrecom_y, dimPrecom_z, dimfull_x, dimfull_y, dimfull_z, widthPrecom, blockPrecom_x, blockPrecom_y, blockPrecom_z, sharedsizePre;
-	cudaArray *ima=0; //, *meansArray=0, *variancesArray=0, *RArray=0;
+	cudaArray *ima=0, *meansArray=0, *variancesArray=0, *RArray=0;
 	cudaEvent_t start, stop;
 	float elapsedTime;
 	
@@ -566,6 +579,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	printf("dim_x=%d\tdim_y=%d\tdim_z=%d\n",dimx,dimy,dimz);
 	// const int sizePre = (dimfull_x*dimfull_y*dimfull_z)*sizeof(float);
 	
+
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
 	cudaExtent imaSize = make_cudaExtent(dimPrecom_x,dimPrecom_y,dimPrecom_z);
 	
@@ -578,14 +592,14 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParams1.dstArray = ima;	// destination array
 	copyParams1.extent = imaSize;		// dimensions of the transferred area in elements
 	copyParams1.kind = cudaMemcpyHostToDevice;	// copy from host to device
-	cudaMemcpy3D(&copyParams1);
+	CUDA_ASSERT(cudaMemcpy3D(&copyParams1));
 	
 	ima_tex.normalized = false;
 	ima_tex.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
 	ima_tex.addressMode[0] = cudaAddressModeClamp;
 	ima_tex.addressMode[1] = cudaAddressModeClamp;
 	ima_tex.addressMode[2] = cudaAddressModeClamp;
-	cudaBindTextureToArray(ima_tex, ima, channelDesc);
+	CUDA_ASSERT(cudaBindTextureToArray(ima_tex, ima, channelDesc));
 	
 	
 	// Allocate global memory for mean, R and variance
@@ -626,10 +640,11 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	
 	CUDA_ASSERT(cudaEventElapsedTime(&elapsedTime,start,stop));
 	printf("Pre-computation kernel time: %f ms\n" ,elapsedTime);
+	// CUDA_ASSERT(cudaUnbindTexture(ima_tex));
 	//@@@@@@@@@@ Pre-processing kernel time end @@@@@@@@@@/
 	
 	
-	
+/*
 	//@@@@@@@@@@ Copy from device to host start @@@@@@@@@@/
 	cudaExtent imaOut = make_cudaExtent(dimfull_x,dimfull_y,dimfull_z);
 	cudaMemcpy3DParms copyParamsOutput1 = {0};
@@ -648,17 +663,60 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParamsOutput2.kind = cudaMemcpyDeviceToHost;	// copy from host to device
 	CUDA_ASSERT(cudaMemcpy3D(&copyParamsOutput2));
 	//@@@@@@@@@@ Copy from device to host end @@@@@@@@@@/
+*/
 
 
 
-/*
 
 
 	//@@@@@@@@@@@@ 1st kernel finished. Binding to texture memory starts @@@@@@@@@@@@/
 	CUDA_ASSERT(cudaEventCreate(&start));
 	CUDA_ASSERT(cudaEventRecord(start,0));
+
+
+
+
+
+
+
+
+
+
+	CUDA_ASSERT(cudaSetDevice(gpuid));
+	// // i>90 && i<100 && j==100 && k==100
+	// for(int i=50;i<150;i++){
+	// 	printf("Input2=%f\n", ima_input2[i*(dimx*dimy)+(100*dimx)+100]);
+	// }	
+	// cudaArray *ima3=0;	
+	// // Load ima_input into texture memory
+	// // cudaMalloc3DArray allocate cudaArray which is only for texture memory
+	// cudaMalloc3DArray(&ima3, &channelDesc, imaSize);
+	// cudaMemcpy3DParms copyParams6 = {0};
+	// // make_cudaPitchedPtr returns cudaPitchedPtr{pitch(pitch of the pointer),ptr(pointer to the allocated mem),xsize,ysize (logical width and height)}
+	// copyParams6.srcPtr = make_cudaPitchedPtr((void*)ima_input2, imaSize.width*sizeof(float), imaSize.width, imaSize.height);
+	// copyParams6.dstArray = ima3;	// destination array
+	// copyParams6.extent = imaSize;		// dimensions of the transferred area in elements
+	// copyParams6.kind = cudaMemcpyHostToDevice;	// copy from host to device
+	// CUDA_ASSERT(cudaMemcpy3D(&copyParams6));
+	
+	// ima_tex3.normalized = false;
+	// ima_tex3.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
+	// ima_tex3.addressMode[0] = cudaAddressModeClamp;
+	// ima_tex3.addressMode[1] = cudaAddressModeClamp;
+	// ima_tex3.addressMode[2] = cudaAddressModeClamp;
+	// CUDA_ASSERT(cudaBindTextureToArray(ima_tex3, ima3, channelDesc));
+
+
+
+
+
+
+
+
+
+
 	//@@@@@@@@@@@@ Binding pre-computed mean, R and variance to texture memory start @@@@@@@@@@@@/
-	cudaExtent Size = make_cudaExtent(dimfull_x,dimfull_y,dimfull_z);	
+	cudaExtent Size = make_cudaExtent(dimfull_x,dimfull_y,dimfull_z);
 	// mean
 	cudaMalloc3DArray(&meansArray, &channelDesc, Size);
 	cudaMemcpy3DParms copyParams2 = {0};
@@ -850,7 +908,11 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 
 
 
-
+	//@@@@@@@@@@ Unbind texture @@@@@@@@@@/
+	CUDA_ASSERT(cudaUnbindTexture(ima_tex));
+	CUDA_ASSERT(cudaUnbindTexture(means_tex));
+	CUDA_ASSERT(cudaUnbindTexture(variances_tex));
+	CUDA_ASSERT(cudaUnbindTexture(R_tex));
 
 
 	//@@@@@@@@@@ Free memory @@@@@@@@@@/
@@ -865,7 +927,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	CUDA_ASSERT(cudaFreeArray(meansArray));
 	CUDA_ASSERT(cudaFreeArray(variancesArray));
 	CUDA_ASSERT(cudaFreeArray(RArray));
-*/
+
 
 	CUDA_ASSERT(cudaFreeArray(ima));
 	CUDA_ASSERT(cudaFree(mean.ptr));

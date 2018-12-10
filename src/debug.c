@@ -39,13 +39,13 @@ int main(int argc, char **argv){
     filterdriver(searchareasize,patchsize,patchsize2,s,isrician,dims,inputimg, &outputimg, &outputimg2);
 
     fp=fopen("outputimg.dat","wr");
-    // fwrite(outputimg,sizeof(float),dims[0]*dims[1]*dims[2],fp);
-    fwrite(outputimg,sizeof(float),(dims[0]+2*(patchsize+searchareasize))*(dims[1]+2*(patchsize+searchareasize))*(dims[2]+2*(patchsize+searchareasize)),fp);
+    fwrite(outputimg,sizeof(float),dims[0]*dims[1]*dims[2],fp);
+    // fwrite(outputimg,sizeof(float),(dims[0]+2*(patchsize+searchareasize))*(dims[1]+2*(patchsize+searchareasize))*(dims[2]+2*(patchsize+searchareasize)),fp);
     fclose(fp);
     
     fp=fopen("outputimg2.dat","wr");
-    // fwrite(outputimg2,sizeof(float),dims[0]*dims[1]*dims[2],fp);
-    fwrite(outputimg2,sizeof(float),(dims[0]+2*(patchsize+searchareasize))*(dims[1]+2*(patchsize+searchareasize))*(dims[2]+2*(patchsize+searchareasize)),fp);
+    fwrite(outputimg2,sizeof(float),dims[0]*dims[1]*dims[2],fp);
+    // fwrite(outputimg2,sizeof(float),(dims[0]+2*(patchsize+searchareasize))*(dims[1]+2*(patchsize+searchareasize))*(dims[2]+2*(patchsize+searchareasize)),fp);
     fclose(fp);
 
     return 0;
@@ -66,9 +66,9 @@ void filterdriver(int v,int f1, int f2, int s, bool r, int dims[3], float *ima, 
     dimfull[2] = dims[2]+2*(f1+v+s);
 
     /*Allocate memory and assign outputimg pointer*/
-    printf("x=%d\t y=%d\t z=%d\n", (dims[0]+2*(f1+v)),(dims[1]+2*(f1+v)),(dims[2]+2*(f1+v)));
-    outputimg[0] = (float*)calloc((dims[0]+2*(f1+v))*(dims[1]+2*(f1+v))*(dims[2]+2*(f1+v)),sizeof(float));   /* Create a real double matrix with the size of inputimg volume*/
-    outputimg2[0] = (float*)calloc((dims[0]+2*(f1+v))*(dims[1]+2*(f1+v))*(dims[2]+2*(f1+v)),sizeof(float));   /* Create a real double matrix with the size of inputimg volume*/
+    printf("x=%d\t y=%d\t z=%d\n", dims[0],dims[1],dims[2]);
+    outputimg[0] = (float*)calloc(dims[0]*dims[1]*dims[2],sizeof(float));   /* Create a real double matrix with the size of inputimg volume*/
+    outputimg2[0] = (float*)calloc(dims[0]*dims[1]*dims[2],sizeof(float));   /* Create a real double matrix with the size of inputimg volume*/
 
     ima_full = (float*)malloc((dimfull[0]*dimfull[1]*dimfull[2])*sizeof(float));
 
