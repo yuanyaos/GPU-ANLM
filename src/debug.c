@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv){
     int searchareasize=3, patchsize=2, patchsize2=1, s=1, count=0;
-    int isrician=0;
+    bool isrician=0;
     char filename[255]={'\0'};
     int dims[3]={166,209,223};
     float *inputimg, *outputimg, *outputimg2;
@@ -29,11 +29,11 @@ int main(int argc, char **argv){
     fread((void*)inputimg,dims[0]*dims[1]*dims[2],sizeof(float),fpread);
     fclose(fpread);
 
-    for(int i=0;i<dims[0]*dims[1]*dims[2];i++){
-        if(i>3490300 && i<3490400)
-    	   printf("input=%f\n",inputimg[i]);
-        count++;
-	}
+ //    for(int i=0;i<dims[0]*dims[1]*dims[2];i++){
+ //        if(i>3490300 && i<3490400)
+ //    	   printf("input=%f\n",inputimg[i]);
+ //        count++;
+	// }
     printf("count=%d\n",count);
 
     filterdriver(searchareasize,patchsize,patchsize2,s,isrician,dims,inputimg, &outputimg, &outputimg2);
@@ -49,7 +49,7 @@ int main(int argc, char **argv){
     return 0;
 }
 
-void filterdriver(int v,int f1, int f2, int s, int r, int dims[3], float *ima, float **outputimg, float **outputimg2)
+void filterdriver(int v,int f1, int f2, int s, bool r, int dims[3], float *ima, float **outputimg, float **outputimg2)
 {
     /*Declarations*/
     float *ima_full, *Estimate, *Estimate2;
@@ -94,8 +94,8 @@ void filterdriver(int v,int f1, int f2, int s, int r, int dims[3], float *ima, f
 
                 if(ima[kt*(dims[0]*dims[1])+(jt*dims[0])+it]>max) max=ima[kt*(dims[0]*dims[1])+(jt*dims[0])+it];
 
-                    if(i>90 && i<100 && j==100 && k==100)
-                        printf("x=%d \t y=%d \t z=%d\t value=%f\n", i, j, k, ima_full[k*dimfull[0]*dimfull[1]+j*dimfull[0]+i]);
+                    // if(i>90 && i<100 && j==100 && k==100)
+                    //     printf("x=%d \t y=%d \t z=%d\t value=%f\n", i, j, k, ima_full[k*dimfull[0]*dimfull[1]+j*dimfull[0]+i]);
             }
         }
     }
@@ -103,6 +103,7 @@ void filterdriver(int v,int f1, int f2, int s, int r, int dims[3], float *ima, f
 
     // runFilter_s(ima_full, Estimate, f1, v, dims[0], dims[1], dims[2], max, width, width, s, gpuid, r);
     runFilter(ima_full, Estimate, f1, Estimate2, f2, v, dims[0], dims[1], dims[2], max, width, width, s, gpuid, r);
+    //runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, bool rician)
 
     return;
 

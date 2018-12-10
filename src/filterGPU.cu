@@ -10,6 +10,12 @@
 // Computational Optics & Translational Imaging Lab
 // Northeastern University
 
+// Publication:
+// Yaoshen Yuan, Leiming Yu, Zafer Dogan, and Qianqian Fang, "Graphics processing
+// units-accelerated adaptive nonlocal means filter for denoising three-dimensional
+// Monte Carlo photon transport simulations," J. of Biomedical Optics, 23(12), 121618 (2018).
+// https://doi.org/10.1117/1.JBO.23.12.121618
+
 // Copyright (C) 2018 Yaoshen Yuan, Qianqian Fang
 
 
@@ -172,18 +178,9 @@ __global__ static void ANLMfilter(float *Estimate)
 	j_sl = threadIdx_y+gcfg->apronShared;
 	k_sl = threadIdx_z+gcfg->apronShared;
 	// return if the thread number exceeds the dimension
-
-	Estimate[k*rc+(j*gcfg->dimx)+i] = (float) blockIdx.z;
-	return;
-	// cn = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);		// the voxel to be filtered
- //    if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0) //  || cn<0
- //    {
- //    	// Estimate[k*rc+(j*gcfg->dimx)+i] = 0;
- //         return;
- //    }
-
-    if(i>90 && i<100 && j==100 && k==150)
-    	printf("x=%d \t y=%d \t z=%d \t value=%f \n", i, j, k, 100);
+	cn = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
+	if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0)
+	 return;
 
 	if(threadIdx_z==0){
 	    kstart = -gcfg->apronShared;
@@ -243,8 +240,10 @@ __global__ static void ANLMfilter(float *Estimate)
 	for(ks=0;ks<kcount;ks++){
 	    for(js=0;js<jcount;js++){
 			for(is=0;is<icount;is++){
+			    cn = tex3D(ima_tex,i_Fl+istart+is,j_Fl+jstart+js,k_Fl+kstart+ks);
+			    cn = (cn>0.0f)?cn:0.0f;
 			    // load the image data into shared memory
-			    ima_space[(k_sl+kstart+ks)*gcfg->sharedSlice+(j_sl+jstart+js)*gcfg->sharedwidth_x+(i_sl+istart+is)] = tex3D(ima_tex,i_Fl+istart+is,j_Fl+jstart+js,k_Fl+kstart+ks);
+			    ima_space[(k_sl+kstart+ks)*gcfg->sharedSlice+(j_sl+jstart+js)*gcfg->sharedwidth_x+(i_sl+istart+is)] = cn;
 			    // load the R value into shared memory
 			    ima_space[(k_sl+kstart+ks)*gcfg->sharedSlice+(j_sl+jstart+js)*gcfg->sharedwidth_x+(i_sl+istart+is+gcfg->sharedwidth)] = tex3D(R_tex,i_fl+istart+is,j_fl+jstart+js,k_fl+kstart+ks);
 			}
@@ -306,13 +305,13 @@ __global__ static void ANLMfilter(float *Estimate)
 	            {
 	                ni=i_fl+ii;
 	                cn = tex3D(ima_tex,i_Fl+ii,j_Fl+jj,k_Fl+kk);	// the value of the center of the non-local patch
-					if(ni-gcfg->apron>=0 && nj-gcfg->apron>=0 && nk-gcfg->apron>=0 && ni-gcfg->apron<gcfg->dimx && nj-gcfg->apron<gcfg->dimy && nk-gcfg->apron<gcfg->dimz && cn>0.0f)
+			if(ni-gcfg->apron>=0 && nj-gcfg->apron>=0 && nk-gcfg->apron>=0 && ni-gcfg->apron<gcfg->dimx && nj-gcfg->apron<gcfg->dimy && nk-gcfg->apron<gcfg->dimz && cn>0.0f)
 	                {  
-	    				ima_tt = ima_space[(k_sl+kk)*(gcfg->sharedSlice)+((j_sl+jj)*gcfg->sharedwidth_x)+(i_sl+ii)];
-	    				means_tt = tex3D(means_tex,ni,nj,nk);
+	    		    ima_tt = ima_space[(k_sl+kk)*(gcfg->sharedSlice)+((j_sl+jj)*gcfg->sharedwidth_x)+(i_sl+ii)];
+	    		    means_tt = tex3D(means_tex,ni,nj,nk);
 	                    variances_tt = tex3D(variances_tex,ni,nj,nk);
 
-						t1 = (means_t)/(means_tt);
+			    t1 = (means_t)/(means_tt);
 	                    t1i= (gcfg->maxval-means_t)/(gcfg->maxval-means_tt);
 	                    t2 = (variances_t)/(variances_tt);
 
@@ -340,12 +339,12 @@ __global__ static void ANLMfilter(float *Estimate)
 	            nj=j_fl+jj;
 	            for(ii=-gcfg->searchsize; ii<=gcfg->searchsize; ii++)
 	            {
-	                ni=i_fl+ii;	 
-	                cn = tex3D(ima_tex,i_Fl+ii,j_Fl+jj,k_Fl+kk);	// the value of the center of the non-local patch               
-					if(ni-gcfg->apron>=0 && nj-gcfg->apron>=0 && nk-gcfg->apron>=0 && ni-gcfg->apron<gcfg->dimx && nj-gcfg->apron<gcfg->dimy && nk-gcfg->apron<gcfg->dimz && cn>0.0f)
+	                ni=i_fl+ii;	
+	                cn = tex3D(ima_tex,i_Fl+ii,j_Fl+jj,k_Fl+kk);	// the value of the center of the non-local patch                
+			if(ni-gcfg->apron>=0 && nj-gcfg->apron>=0 && nk-gcfg->apron>=0 && ni-gcfg->apron<gcfg->dimx && nj-gcfg->apron<gcfg->dimy && nk-gcfg->apron<gcfg->dimz && cn>0.0f)
 	                {  
-	    				ima_tt = ima_space[(k_sl+kk)*(gcfg->sharedSlice)+((j_sl+jj)*gcfg->sharedwidth_x)+(i_sl+ii)];
-	    				means_tt = tex3D(means_tex,ni,nj,nk);
+	    		    ima_tt = ima_space[(k_sl+kk)*(gcfg->sharedSlice)+((j_sl+jj)*gcfg->sharedwidth_x)+(i_sl+ii)];
+	    		    means_tt = tex3D(means_tex,ni,nj,nk);
 	                    variances_tt = tex3D(variances_tex,ni,nj,nk);
 
 						t1 = (means_t)/(means_tt);
@@ -366,11 +365,11 @@ __global__ static void ANLMfilter(float *Estimate)
 	    totalweight = (totalweight>0.0f)?totalweight:1.0f;
 	    estimate = estimate/totalweight;
 	    estimate = estimate-2.0f*distanciaminima;
-	    estimate = (estimate>0.0f)?estimate:0;
+	    estimate = (estimate>0.0f)?estimate:0.0f;
 	    estimate = sqrtf(estimate);
 	}
 
-	Estimate[k*rc+(j*gcfg->dimx)+i] = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
+	Estimate[k*rc+(j*gcfg->dimx)+i] = estimate;
 	__syncthreads();
 
 }
@@ -381,7 +380,8 @@ __global__ static void preProcess(cudaPitchedPtr mean, cudaPitchedPtr R, cudaPit
 
 	int sharedwidthSlice, sharedwidth, threadIdx_x, threadIdx_y, threadIdx_z, istart, jstart, kstart, icount, jcount, kcount, i, j, k, ii, jj, kk, i_fl, j_fl, k_fl, i_sl, j_sl, k_sl, is, js, ks;
 	int N = (2*s+1)*(2*s+1)*(2*s+1);	// size of the filter box
-	
+	float temp;
+
 	sharedwidth = blockwidth+2*s;
 	sharedwidthSlice = sharedwidth*sharedwidth;
 	
@@ -465,7 +465,9 @@ __global__ static void preProcess(cudaPitchedPtr mean, cudaPitchedPtr R, cudaPit
 	    for(js=0;js<jcount;js++){
 			for(is=0;is<icount;is++){
 			    // load the image data into shared memory
-			    ima_shared[(k_sl+kstart+ks)*sharedwidthSlice+(j_sl+jstart+js)*sharedwidth+(i_sl+istart+is)] = tex3D(ima_tex,i_fl+istart+is,j_fl+jstart+js,k_fl+kstart+ks);
+			    temp = tex3D(ima_tex,i_fl+istart+is,j_fl+jstart+js,k_fl+kstart+ks);
+			    temp = (temp>0.0f)?temp:0.0f;
+			    ima_shared[(k_sl+kstart+ks)*sharedwidthSlice+(j_sl+jstart+js)*sharedwidth+(i_sl+istart+is)] = temp;
 			}
 	    }
 	}
@@ -525,7 +527,7 @@ void cuda_assess(cudaError_t cuerr,const char *file, const int linenum){
      }
 }
 
-void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, int rician)
+void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, bool rician)
 
 {
 /*

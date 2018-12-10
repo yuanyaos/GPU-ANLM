@@ -23,7 +23,7 @@ typedef struct  KernelParams {
 } FilterParam;
 
 /* void runFilter4(float * ima_input, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width2, int width, int s, int gpuid, bool rician)  */
-void runFilter(float * ima, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width, int width2, int s, int gpuid, int rician);
+void runFilter(float * ima, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width, int width2, int s, int gpuid, bool rician);
 
 void runFilter_v(float * ima, float * Estimate1, int f1, float * Estimate2, int f2, int v, int dimx, int dimy, int dimz, float MAX, int width, int width2, int s, int gpuid, int rician);
 
