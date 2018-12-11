@@ -548,6 +548,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop,gpuid);
 	printf("Device name: %s\n",prop.name);
+	CUDA_ASSERT(cudaSetDevice(gpuid));
 	
 	//@@@@@@@@@@@@ Pre-processing kernel starts @@@@@@@@@@@@/
 	int dimPrecom_x, dimPrecom_y, dimPrecom_z, dimfull_x, dimfull_y, dimfull_z, widthPrecom, blockPrecom_x, blockPrecom_y, blockPrecom_z, sharedsizePre;
@@ -577,14 +578,14 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParams1.dstArray = ima;	// destination array
 	copyParams1.extent = imaSize;		// dimensions of the transferred area in elements
 	copyParams1.kind = cudaMemcpyHostToDevice;	// copy from host to device
-	cudaMemcpy3D(&copyParams1);
+	CUDA_ASSERT(cudaMemcpy3D(&copyParams1));
 	
 	ima_tex.normalized = false;
 	ima_tex.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
 	ima_tex.addressMode[0] = cudaAddressModeClamp;
 	ima_tex.addressMode[1] = cudaAddressModeClamp;
 	ima_tex.addressMode[2] = cudaAddressModeClamp;
-	cudaBindTextureToArray(ima_tex, ima, channelDesc);
+	CUDA_ASSERT(cudaBindTextureToArray(ima_tex, ima, channelDesc));
 	
 	
 	// Allocate global memory for mean, R and variance
@@ -658,6 +659,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	//@@@@@@@@@@@@ 1st kernel finished. Binding to texture memory starts @@@@@@@@@@@@/
 	CUDA_ASSERT(cudaEventCreate(&start));
 	CUDA_ASSERT(cudaEventRecord(start,0));
+	CUDA_ASSERT(cudaSetDevice(gpuid));
 	//@@@@@@@@@@@@ Binding pre-computed mean, R and variance to texture memory start @@@@@@@@@@@@/
 	cudaExtent Size = make_cudaExtent(dimfull_x,dimfull_y,dimfull_z);	
 	// mean
@@ -668,14 +670,14 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParams2.dstArray = meansArray;	// destination array
 	copyParams2.extent = Size;		// dimensions of the transferred area in elements
 	copyParams2.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams2);
+	CUDA_ASSERT(cudaMemcpy3D(&copyParams2));
 	
 	means_tex.normalized = false;
 	means_tex.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
 	means_tex.addressMode[0] = cudaAddressModeClamp;
 	means_tex.addressMode[1] = cudaAddressModeClamp;
 	means_tex.addressMode[2] = cudaAddressModeClamp;
-	cudaBindTextureToArray(means_tex, meansArray, channelDesc);
+	CUDA_ASSERT(cudaBindTextureToArray(means_tex, meansArray, channelDesc));
 	
 	// R
 	cudaMalloc3DArray(&RArray, &channelDesc, Size);
@@ -685,14 +687,14 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParams3.dstArray = RArray;	// destination array
 	copyParams3.extent = Size;		// dimensions of the transferred area in elements
 	copyParams3.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams3);
+	CUDA_ASSERT(cudaMemcpy3D(&copyParams3));
 	
 	R_tex.normalized = false;
 	R_tex.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
 	R_tex.addressMode[0] = cudaAddressModeClamp;
 	R_tex.addressMode[1] = cudaAddressModeClamp;
 	R_tex.addressMode[2] = cudaAddressModeClamp;
-	cudaBindTextureToArray(R_tex, RArray, channelDesc);
+	CUDA_ASSERT(cudaBindTextureToArray(R_tex, RArray, channelDesc));
 	
 	// variance
 	cudaMalloc3DArray(&variancesArray, &channelDesc, Size);
@@ -702,14 +704,14 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	copyParams4.dstArray = variancesArray;	// destination array
 	copyParams4.extent = Size;		// dimensions of the transferred area in elements
 	copyParams4.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams4);
+	CUDA_ASSERT(cudaMemcpy3D(&copyParams4));
 	
 	variances_tex.normalized = false;
 	variances_tex.filterMode = cudaFilterModePoint;	//cudaFilterModePoint; cudaFilterModeLinear;
 	variances_tex.addressMode[0] = cudaAddressModeClamp;
 	variances_tex.addressMode[1] = cudaAddressModeClamp;
 	variances_tex.addressMode[2] = cudaAddressModeClamp;
-	cudaBindTextureToArray(variances_tex, variancesArray, channelDesc);
+	CUDA_ASSERT(cudaBindTextureToArray(variances_tex, variancesArray, channelDesc));
 	
 	CUDA_ASSERT(cudaEventCreate(&stop));
 	CUDA_ASSERT(cudaEventRecord(stop,0));
@@ -815,7 +817,7 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 	}
 
 	param.patchsize = f2;
-    param.rpatchnomalize = 1.f/((f2<<1)+1);
+    	param.rpatchnomalize = 1.f/((f2<<1)+1);
 	param.rpatchnomalize = param.rpatchnomalize*param.rpatchnomalize*param.rpatchnomalize;
 	param.blockdimx = (dimx+width-1)/width;
 	param.blockdimy = (dimy+width-1)/width;
@@ -851,7 +853,11 @@ void runFilter(float * ima_input, float * Estimate1, int f1, float * Estimate2, 
 
 
 
-
+	//@@@@@@@@@@ Unbind texture @@@@@@@@@@/
+	CUDA_ASSERT(cudaUnbindTexture(ima_tex));
+	CUDA_ASSERT(cudaUnbindTexture(means_tex));
+	CUDA_ASSERT(cudaUnbindTexture(variances_tex));
+	CUDA_ASSERT(cudaUnbindTexture(R_tex));
 
 
 	//@@@@@@@@@@ Free memory @@@@@@@@@@/

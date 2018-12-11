@@ -38,7 +38,7 @@ blockwidth           =           8;     % the 3D block width in GPU
 % run MCXLAB
 tic
 flux=mcxlab(cfg);
-t_mc1 = toc
+t_mc1 = toc;
 rima = sum(flux.data,4);
 
 % run filter
@@ -46,7 +46,7 @@ tic;
 [imaS1,imaL1]=ganlm(rima,v,f1,f2,rician,gpuid,blockwidth);
 % Sub-band mixing process
 image1=mixingsubband(imaS1,imaL1); % originally fimau1,fimao1
-t_filter=toc
+t_filter=toc;
 
 %% Equivalent photon number
 
@@ -60,8 +60,8 @@ rima2 = sum(flux2.data,4);
 
 figure,
 subplot(131),imagesc(squeeze(log10(rima(:,50,:))),[-4 8]),colormap jet, axis off
-title(['Before filter (t_{mc}=' num2str(t_mc1) 's)'])
+title(['1e7 photons before filter (t_{mc}=' num2str(t_mc1) 's)'])
 subplot(132),imagesc(squeeze(log10(image1(:,50,:))),[-4 8]),colormap jet, axis off
 title(['After filter (t_{mc}+t_{filter}=' num2str(t_mc1+t_filter) 's)'])
 subplot(133),imagesc(squeeze(log10(rima2(:,50,:))),[-4 8]),colormap jet, axis off
-title(['Equivalent photon # (t_{filter}=' num2str(t_mc2) 's)'])
+title(['Equivalent photon 3.5e7 (t_{filter}=' num2str(t_mc2) 's)'])
