@@ -145,8 +145,8 @@ __global__ static void ANLMfilter(float *Estimate)
 	// const float pi = 3.14159265359f;
 	const float mu1 = 0.95f;
 	const float var1 = 0.5f;
-    const float rmu1= 1.f/mu1;
-    const float rvar1= 1.f/var1;
+    	const float rmu1= 1.f/mu1;
+    	const float rvar1= 1.f/var1;
 	rc=gcfg->dimy*gcfg->dimx;
 	estimate = 0.0f;
 
@@ -179,7 +179,7 @@ __global__ static void ANLMfilter(float *Estimate)
 	// return if the thread number exceeds the dimension
 	cn = tex3D(ima_tex,i_Fl,j_Fl,k_Fl);
 	if(i>=gcfg->dimx || j>=gcfg->dimy || k>=gcfg->dimz || cn<0)
-	 return;
+	    return;
 
 	if(threadIdx_z==0){
 	    kstart = -gcfg->apronShared;

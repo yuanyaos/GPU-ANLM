@@ -58,10 +58,24 @@ flux2=mcxlab(cfg);
 t_mc2 = toc;
 rima2 = sum(flux2.data,4);
 
+%% Single filtering
+% Instead of filtering MC image twice with different patch sizes, one can
+% also use single filtering to achieve higher speed but at the expense of
+% relatively lower SNR.
+
+tic;
+% The output has the same order of f1 and f2
+[imaS2,~]=ganlm(rima,v,f1,0);
+t_single = toc;
+
+%% Plot
+
 figure,
-subplot(131),imagesc(squeeze(log10(rima(:,50,:))),[-4 8]),colormap jet, axis off
+subplot(221),imagesc(squeeze(log10(rima(:,50,:))),[-4 8]),colormap jet, axis off
 title(['1e7 photons before filter (t_{mc}=' num2str(t_mc1) 's)'])
-subplot(132),imagesc(squeeze(log10(image1(:,50,:))),[-4 8]),colormap jet, axis off
+subplot(222),imagesc(squeeze(log10(image1(:,50,:))),[-4 8]),colormap jet, axis off
 title(['After filter (t_{mc}+t_{filter}=' num2str(t_mc1+t_filter) 's)'])
-subplot(133),imagesc(squeeze(log10(rima2(:,50,:))),[-4 8]),colormap jet, axis off
+subplot(223),imagesc(squeeze(log10(rima2(:,50,:))),[-4 8]),colormap jet, axis off
 title(['Equivalent photon 3.5e7 (t_{filter}=' num2str(t_mc2) 's)'])
+subplot(224),imagesc(squeeze(log10(imaS2(:,50,:))),[-4 8]),colormap jet, axis off
+title(['Single filtering (t_{mc}+t_{single}=' num2str(t_mc1+t_single) 's)'])
