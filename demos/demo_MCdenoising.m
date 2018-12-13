@@ -11,6 +11,10 @@ clc
 addpath(genpath('../'))
 load data
 
+if ~exist('bin','dir')
+    error('You must compile before running filter. Go to src folder and make file.')
+end
+
 %%%%%%%%%% Parameter setting (recommended for high speed) %%%%%%%%%%
 v                    =           3;     % search radius
 f1                   =           1;     % 1st filtering patch radius

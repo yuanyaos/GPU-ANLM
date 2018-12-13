@@ -11,6 +11,10 @@
 addpath(genpath('...')) % add path of MCX
 addpath(genpath('../')) % add path of ANLM filter
 
+if ~exist('bin','dir')
+    error('You must compile before running filter. Go to src folder and make file.')
+end
+
 clear cfg
 cfg.nphoton=1e7;
 cfg.vol=uint8(ones(100,100,100));

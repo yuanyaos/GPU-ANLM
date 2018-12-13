@@ -32,6 +32,9 @@ clc
 addpath(genpath('../'))
 load data
 
+if ~exist('bin','dir')
+    error('You must compile before running filter. Go to src folder and make file.')
+end
 %% GPU-accelerated ANLM
 %%%%%%%%%% Parameter setting (recommended for high speed) %%%%%%%%%%
 % Baseline+Opt1+Opt2+Opt3+Opt4
